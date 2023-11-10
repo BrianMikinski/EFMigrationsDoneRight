@@ -5,10 +5,19 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-// See https://aka.ms/new-console-template for more information
 Console.WriteLine("Hello, World! Welcome to EF Migrations Done Right");
 
 var blogContext = new BlogDbContext();
+
+blogContext.Database.EnsureDeleted();
+blogContext.Database.EnsureCreated();
+blogContext.Add(new Post());
+
+blogContext.SaveChanges();
+
+var results = blogContext.Posts.Where(p => true).ToList();
+
+Console.WriteLine($"Total Count: {results.Count}");
 
 public class BlogDbContext : DbContext
 {
@@ -83,7 +92,7 @@ public class Post
     [StringLength(1000)]
     public string? Content { get; init; }
 
-    public Guid? CategoryId { get; init; }
+    // public Guid? CategoryId { get; init; }
 
     //public Category? Category { get; init; }
 

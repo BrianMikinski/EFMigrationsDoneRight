@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EfMigrationsDoneRight.Migrations
 {
     [DbContext(typeof(BlogDbContext))]
-    [Migration("20231110053432_InitialMigration")]
+    [Migration("20231110060942_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -28,9 +28,6 @@ namespace EfMigrationsDoneRight.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("CategoryId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Content")
