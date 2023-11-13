@@ -7,3 +7,5 @@ param (
 # Create new migration
 $MigrationName = Read-Host -Prompt 'What is the name of the new migration?'
 dotnet ef migrations add $MigrationName -c BlogDbContext -- $connectionString
+
+dotnet ef context
