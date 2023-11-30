@@ -7,9 +7,16 @@ var blogContext = new BlogDbContext();
 
 blogContext.Database.EnsureDeleted();
 blogContext.Database.EnsureCreated();
-blogContext.Add(new Post());
 
+// add category
+var category = blogContext.Categories.Add(new Category());
 blogContext.SaveChanges();
+
+// add post
+blogContext.Add(new Post());
+blogContext.SaveChanges();
+
+// add post tags
 
 var results = blogContext.Posts.Where(p => true).ToList();
 
@@ -19,9 +26,9 @@ public class BlogDbContext : DbContext
 {
     public DbSet<Post> Posts { get; set; }
 
-    // public DbSet<PostTag> PostTags { get; set; }
+    public DbSet<Category> Categories { get; set; }
 
-    // public DbSet<Category> Categories { get; set; }
+    // public DbSet<PostTag> PostTags { get; set; }
 
     // public DbSet<Tag> Tags { get; set; }
 
@@ -78,6 +85,7 @@ public class Post
         Id = Guid.NewGuid();
         Title = "EF Core is awesome!";
         Content = "Some cool EF Core stuff";
+       
     }
 
     public Guid Id { get; private set; }
@@ -88,26 +96,26 @@ public class Post
     [StringLength(1000)]
     public string? Content { get; init; }
 
-    // public Guid? CategoryId { get; init; }
+    public Guid? CategoryId { get; init; }
 
-    //public Category? Category { get; init; }
+    public Category? Category { get; init; }
 
     //public IEnumerable<PostTag>? PostTags { get; set; }
 }
 
-// public class Category
-// {
-//     public Category()
-//     {
-//         Id = Guid.NewGuid();
-//         Name = "Software Engineering";
-//     }
+public class Category
+{
+    public Category()
+    {
+        Id = Guid.NewGuid();
+        Name = "Software Engineering";
+    }
 
-//     public Guid Id { get; init; }
+    public Guid Id { get; init; }
 
-//     [StringLength(50)]
-//     public string Name { get; init; }
-// }
+    [StringLength(50)]
+    public string Name { get; init; }
+}
 
 // public class PostTag
 // {
