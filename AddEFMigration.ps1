@@ -8,4 +8,5 @@ param (
 $MigrationName = Read-Host -Prompt 'What is the name of the new migration?'
 dotnet ef migrations add $MigrationName -c BlogDbContext -- $connectionString
 
-dotnet ef context
+# output full db context to a folder for retaining in source control
+dotnet ef dbcontext script -h --output ./DbContextAsSql/blog.sql

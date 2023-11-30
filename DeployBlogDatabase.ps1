@@ -5,6 +5,6 @@ param (
 
 # build ef migrations bundle - a self contined executable for deploying the database changes
 dotnet build EfMigrationsDoneRight.csproj --runtime win-x64
-dotnet ef migrations bundle --no-build -c BlogDbContext --output blogDbContextBundle.exe --force -- "" --self-contained#--force -- "" --self-contained --verbose 
+dotnet ef migrations bundle --no-build -c BlogDbContext --output blogDbContextBundle.exe --force -- "" --self-contained #--force -- "" --self-contained --verbose 
 
 & .\blogDbContextBundle.exe -- --connection $connectionString
