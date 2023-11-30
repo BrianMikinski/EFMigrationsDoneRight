@@ -14,11 +14,16 @@ var tagB = new Tag("EF Core");
 blogContext.SaveChanges();
 
 // add category
-var category = blogContext.Categories.Add(new Category());
+var category = new Category();
+blogContext.Categories.Add(category);
 blogContext.SaveChanges();
 
 // add post
-var post = new Post();
+var post = new Post
+{
+    CategoryId = category.Id
+};
+
 blogContext.Add(post);
 blogContext.SaveChanges();
 
@@ -81,7 +86,7 @@ public class Post
     [StringLength(1000)]
     public string? Content { get; init; }
 
-    public Guid? CategoryId { get; init; }
+    public Guid? CategoryId { get; set; }
 
     public Category? Category { get; init; }
 
