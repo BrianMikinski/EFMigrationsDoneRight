@@ -8,15 +8,25 @@ var blogContext = new BlogDbContext();
 blogContext.Database.EnsureDeleted();
 blogContext.Database.EnsureCreated();
 
+// add post tags
+var tagA = new Tag("DotNet 8");
+var tagB = new Tag("EF Core");
+blogContext.SaveChanges();
+
 // add category
 var category = blogContext.Categories.Add(new Category());
 blogContext.SaveChanges();
 
 // add post
-blogContext.Add(new Post());
+var post = new Post();
+blogContext.Add(post);
 blogContext.SaveChanges();
 
-// add post tags
+var postTagA = new PostTag(post, tagA);
+var postTagB = new PostTag(post, tagA);
+
+blogContext.PostTags.AddRange(postTagA, postTagB);
+blogContext.SaveChanges();
 
 var results = blogContext.Posts.Where(p => true).ToList();
 
@@ -28,64 +38,39 @@ public class BlogDbContext : DbContext
 
     public DbSet<Category> Categories { get; set; }
 
-    // public DbSet<PostTag> PostTags { get; set; }
+    public DbSet<PostTag> PostTags { get; set; }
 
-    // public DbSet<Tag> Tags { get; set; }
+    public DbSet<Tag> Tags { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=Blog;Trusted_Connection=True;");
     }
 
-    // protected override void OnModelCreating(ModelBuilder modelBuilder)
-    // {
-    //     modelBuilder.Entity<PostTag>()
-    //         .HasIndex(t => new { t.PostId, t.TagId });
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<PostTag>()
+            .HasIndex(t => new { t.PostId, t.TagId });
 
-    //     modelBuilder.Entity<PostTag>()
-    //     .HasOne(pt => pt.Post)
-    //     .WithMany(p => p.PostTags)
-    //     .HasForeignKey(pt => pt.PostId);
+        modelBuilder.Entity<PostTag>()
+        .HasOne(pt => pt.Post)
+        .WithMany(p => p.PostTags)
+        .HasForeignKey(pt => pt.PostId);
 
-    //     modelBuilder.Entity<PostTag>()
-    //         .HasOne(pt => pt.Tag)
-    //         .WithMany(t => t.PostTags)
-    //         .HasForeignKey(pt => pt.TagId);
-    // }
+        modelBuilder.Entity<PostTag>()
+            .HasOne(pt => pt.Tag)
+            .WithMany(t => t.PostTags)
+            .HasForeignKey(pt => pt.TagId);
+    }
 }
 
 public class Post
 {
-    // public static (Post, IEnumerable<PostTag>) NewPostWithCategoriesAndTags(Category category, IEnumerable<Tag> tags)
-    // {
-    //     var post = new Post()
-    //     {
-    //         Id = Guid.NewGuid(),
-    //         Category = category,
-    //         Title = "EF Core is awesome!",
-    //         Content = "Some ramblings on EF Core",
-    //     };
-
-    //     var postTags = new List<PostTag>();
-
-    //     foreach (var tag in tags)
-    //     {
-    //         postTags.Add(new PostTag()
-    //         {
-    //             TagId = tag.Id,
-    //             PostId = post.Id
-    //         });
-    //     }
-
-    //     return (post, postTags);
-    // }
-
-    public Post()
+    public Post(string title = "EF Core is awesome!", string content = "Some cool EF Core stuff")
     {
         Id = Guid.NewGuid();
-        Title = "EF Core is awesome!";
-        Content = "Some cool EF Core stuff";
-       
+        Title = title;
+        Content = content;
     }
 
     public Guid Id { get; private set; }
@@ -100,15 +85,15 @@ public class Post
 
     public Category? Category { get; init; }
 
-    //public IEnumerable<PostTag>? PostTags { get; set; }
+    public IEnumerable<PostTag>? PostTags { get; set; }
 }
 
 public class Category
 {
-    public Category()
+    public Category(string name = "Software Engineering")
     {
         Id = Guid.NewGuid();
-        Name = "Software Engineering";
+        Name = name;
     }
 
     public Guid Id { get; init; }
@@ -117,35 +102,47 @@ public class Category
     public string Name { get; init; }
 }
 
-// public class PostTag
-// {
-//     public PostTag()
-//     {
-//         Post = new();
-//         Tag = new();
-//     }
-//     public Guid Id { get; set; }
+public class PostTag
+{
+    public PostTag()
+    {
+        Id = Guid.NewGuid();
+        Post = new Post();
+        Tag = new Tag();
+    }
 
-//     public Guid PostId { get; init; }
+    public PostTag(Post post, Tag tag)
+    {
+        Id = Guid.NewGuid();
+        Post = post;
+        PostId = Post.Id;
+        Tag = tag;
+        TagId = Tag.Id;
+    }
+    public Guid Id { get; set; }
 
-//     public Post Post { get; init; }
+    public Guid PostId { get; init; }
 
-//     public Guid TagId { get; init; }
-//     public Tag Tag { get; init; }
-// }
+    public Post Post { get; init; }
 
-// public class Tag
-// {
-//     public Tag()
-//     {
-//         Name = "Ef Core";
-//         PostTags = new List<PostTag>();
-//     }
+    public Guid TagId { get; init; }
 
-//     public Guid Id { get; set; }
+    public Tag Tag { get; init; }
+}
 
-//     [StringLength(50)]
-//     public string Name { get; set; }
+public class Tag
+{
+    public Tag(string name = "EF Core")
+    {
+        Id = Guid.NewGuid();
+        Name = name;
+        PostTags = new List<PostTag>();
+    }
 
-//     public IEnumerable<PostTag> PostTags { get; set; }
-// }
+    public Guid Id { get; set; }
+
+    [StringLength(50)]
+    public string Name { get; set; }
+
+    public IEnumerable<PostTag> PostTags { get; set; }
+}
